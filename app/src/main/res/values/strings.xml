@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name" translatable="false">RecOrder</string>
+    <string name="start_rec">START</string>
+    <string name="stop_rec">STOP</string>
+    <string name="colon" translatable="false">:</string>
+    <string name="list_menu">LIST</string>
+    <string name="channel_name" translatable="false">recorder_app</string>
+    <string name="channel_description" translatable="false">channel for tktpl recorder app</string>
+</resources>
