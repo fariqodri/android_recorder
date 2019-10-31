@@ -7,36 +7,36 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFile
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioMetadata
 
 @Dao
-interface AudioFileDao {
+abstract class AudioFileDao {
     @Transaction
     @Query("SELECT * from audio_files")
-    fun findAll(): LiveData<List<AudioFileWithMetadata>>
+    abstract fun findAll(): LiveData<List<AudioFileWithMetadata>>
 
     @Transaction
     @Query("SELECT * from audio_files WHERE id = :id")
-    fun findById(id: Int): LiveData<AudioFileWithMetadata>
+    abstract fun findById(id: Int): LiveData<AudioFileWithMetadata>
 
     @Transaction
     @Query("SELECT * from audio_files WHERE fileLocation LIKE :location")
-    fun findAllbyLocation(location: String): LiveData<List<AudioFileWithMetadata>>
+    abstract fun findAllbyLocation(location: String): LiveData<List<AudioFileWithMetadata>>
 
     @Query("DELETE FROM audio_files WHERE id = :id")
-    fun deleteById(id: Int)
+    abstract fun deleteById(id: Int)
 
     @Insert
-    fun insert(audioFile: AudioFile): Long
+    abstract suspend fun insert(audioFile: AudioFile): Long
 
     @Delete
-    fun delete(audioFile: AudioFile)
+    abstract fun delete(audioFile: AudioFile)
 
     @Update
-    fun update(audioFile: AudioFile)
+    abstract fun update(audioFile: AudioFile)
 
-    @Transaction
-    fun upsert(audioFile: AudioFile) {
-        val id = insert(audioFile)
-        if (id == -1L) {
-            update(audioFile)
-        }
-    }
+//    @Transaction
+//    suspend fun upsert(audioFile: AudioFile) {
+//        val id = insert(audioFile)
+//        if (id == -1L) {
+//            update(audioFile)
+//        }
+//    }
 }

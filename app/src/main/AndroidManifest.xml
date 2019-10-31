@@ -1,17 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder">
+
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
-        >
-        <service android:name=".services.RecorderService"/>
-        <activity android:name=".activities.MainActivity" android:launchMode="singleTop">
+        android:theme="@style/Theme.MaterialComponents.Light.NoActionBar">
+        <activity android:name=".activities.AudioListActivity"></activity>
+
+        <service android:name=".services.RecorderService" />
+
+        <service android:name=".services.PlayerService" />
+
+        <receiver
+            android:name=".receivers.TimerReceiver"
+            android:exported="true" />
+
+        <activity
+            android:name=".activities.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,4 +32,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

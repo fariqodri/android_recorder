@@ -30,7 +30,7 @@ class RecorderService : Service() {
         startForeground(1, notification)
         startRecording(filename)
         Log.d("onStartCommand", "finished")
-        return START_REDELIVER_INTENT
+        return START_NOT_STICKY
     }
 
     private fun startRecording(filename: String?) {

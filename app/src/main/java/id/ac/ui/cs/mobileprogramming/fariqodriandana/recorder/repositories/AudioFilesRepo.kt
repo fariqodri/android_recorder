@@ -1,16 +1,20 @@
 package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.repositories
 
+import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.dao.AudioFileDao
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.databases.AppDatabase
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFile
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFileWithMetadata
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioMetadata
 
 class AudioFilesRepo(private val audioFileDao: AudioFileDao) {
     companion object {
-        private var audioFilesRepo: AudioFilesRepo? = null
-        fun getInstance(audioFileDao: AudioFileDao): AudioFilesRepo? {
-            if (audioFilesRepo == null) {
-                audioFilesRepo = AudioFilesRepo(audioFileDao)
+        private lateinit var audioFilesRepo: AudioFilesRepo
+        fun getInstance(context: Context): AudioFilesRepo? {
+            if (!::audioFilesRepo.isInitialized) {
+                audioFilesRepo = AudioFilesRepo(AppDatabase.getInstance(context)!!.audioFileDao())
             }
             return audioFilesRepo
         }
@@ -24,13 +28,13 @@ class AudioFilesRepo(private val audioFileDao: AudioFileDao) {
         return audioFileDao.findAll()
     }
 
-    fun insert(audioFile: AudioFile) {
-        audioFileDao.insert(audioFile)
+    suspend fun insert(audioFile: AudioFile): Long {
+        return audioFileDao.insert(audioFile)
     }
 
-    fun save(audioFile: AudioFile) {
-        audioFileDao.upsert(audioFile)
-    }
+//    suspend fun save(audioFile: AudioFile) {
+//        audioFileDao.upsert(audioFile)
+//    }
 
     fun delete(audioFile: AudioFile) {
         audioFileDao.delete(audioFile)

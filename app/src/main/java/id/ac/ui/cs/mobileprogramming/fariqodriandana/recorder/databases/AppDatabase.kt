@@ -9,7 +9,7 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.dao.AudioMetadataD
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFile
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioMetadata
 
-@Database(entities = [AudioFile::class, AudioMetadata::class], version = 1)
+@Database(entities = [AudioFile::class, AudioMetadata::class], version = 6)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun audioFileDao(): AudioFileDao
@@ -21,7 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
         fun getInstance(context: Context): AppDatabase? {
             if (instance == null) {
                 synchronized(AppDatabase::class) {
-                    instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "appdata.db").build()
+                    instance = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "appdata.db").fallbackToDestructiveMigration().build()
                 }
             }
             return instance

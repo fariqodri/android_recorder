@@ -14,9 +14,9 @@ import androidx.room.PrimaryKey
 )
 data class AudioMetadata (
     @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
+    val id: Long? = null,
     val timestamp: Long,
     val duration: Int,
     @ColumnInfo(index = true)
-    val fileId: Int
+    var fileId: Long
 )
