@@ -22,6 +22,17 @@
             android:name=".receivers.StopwatchReceiver"
             android:exported="true" />
 
+        <provider
+            android:authorities="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/shared_files_path"
+                />
+        </provider>
+
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop">

@@ -1,10 +1,7 @@
 package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.fragments
 
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -25,7 +22,6 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.services.RecorderS
 import androidx.lifecycle.Observer
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.databinding.FragmentRecorderBinding
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.RecordingModel
-import java.util.*
 import kotlinx.coroutines.*
 
 /**
@@ -108,8 +104,9 @@ class RecorderFragment : Fragment() {
 
     private fun startRecord() {
         val startIntent = Intent(activity, RecorderService::class.java)
-        val fileName = "${Date().time}.m4a"
-        val fileLocation = "${activity.filesDir}/${fileName}"
+        val fileName = "${System.currentTimeMillis()}.m4a"
+        val fileLocation = "${activity.getExternalFilesDir("")}/$fileName"
+        Log.d("Location", fileLocation)
         startIntent.putExtra("filename", fileName)
         startIntent.putExtra("fileLocation", fileLocation)
         startForegroundService(activity, startIntent)

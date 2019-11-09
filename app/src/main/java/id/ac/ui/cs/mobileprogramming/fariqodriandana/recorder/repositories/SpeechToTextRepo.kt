@@ -30,7 +30,7 @@ class SpeechToTextRepo {
         val file = File(fileLocation)
         val requestBody = RequestBody.create(MediaType.parse("audio/mpeg"), file)
         val fileUpload = MultipartBody.Part.createFormData("audio", fileName, requestBody)
-        val channelId = MultipartBody.Part.createFormData("channel_id", "00c05f52-0261-4e44-819f-549e38d529d7")
+        val channelId = MultipartBody.Part.createFormData("channel_id", "fariqodri")
         speechToTextApi.recognizeSpeech(fileUpload, channelId).enqueue(object : Callback<SpeechToTextModel> {
             override fun onFailure(call: Call<SpeechToTextModel>, t: Throwable) {
                 Log.e("Failure", t.message)

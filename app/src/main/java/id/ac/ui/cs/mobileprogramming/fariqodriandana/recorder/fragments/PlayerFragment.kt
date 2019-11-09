@@ -95,7 +95,10 @@ class PlayerFragment : Fragment() {
         audioRecyclerView.adapter = audioFileListAdapter
         audioRecyclerView.addItemDecoration(DividerItemDecoration(activity, layoutManager.orientation))
         viewModel.listOfAudioFileWithMetadata.observe(this, Observer {
-            items.addAll(it)
+            items.apply {
+                clear()
+                addAll(it)
+            }
             audioRecyclerView.adapter!!.notifyDataSetChanged()
         })
     }

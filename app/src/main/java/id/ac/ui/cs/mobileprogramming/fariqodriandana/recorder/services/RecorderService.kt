@@ -11,6 +11,7 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.R
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.enums.RecordIntentActionEnum
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.RecordingModel
 import java.io.IOException
+import java.lang.Exception
 import java.lang.IllegalStateException
 import java.util.*
 import kotlin.properties.Delegates
@@ -46,15 +47,17 @@ class RecorderService : Service() {
         recorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setOutputFile(filename)
             setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
 
             try {
+                setOutputFile(filename)
                 prepare()
             } catch (e: IllegalStateException) {
-                Log.e("Recording", e.message)
+                e.printStackTrace()
             } catch (e: IOException) {
-                Log.e("Recording", e.message)
+                e.printStackTrace()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
             timestampStart = Date().time
             start()
