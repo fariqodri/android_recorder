@@ -1,6 +1,7 @@
 package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.fragments
 
 
+import android.accounts.AccountManager
 import android.content.*
 import android.os.Bundle
 import android.util.Log
@@ -106,7 +107,6 @@ class RecorderFragment : Fragment() {
         val startIntent = Intent(activity, RecorderService::class.java)
         val fileName = "${System.currentTimeMillis()}.m4a"
         val fileLocation = "${activity.getExternalFilesDir("")}/$fileName"
-        Log.d("Location", fileLocation)
         startIntent.putExtra("filename", fileName)
         startIntent.putExtra("fileLocation", fileLocation)
         startForegroundService(activity, startIntent)

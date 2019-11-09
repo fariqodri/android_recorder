@@ -6,9 +6,13 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "audio_metadatas", foreignKeys = [
-        ForeignKey(entity = AudioMetadata::class,
+        ForeignKey(entity = AudioFile::class,
             parentColumns = ["id"],
             childColumns = ["fileId"],
+            onDelete = ForeignKey.SET_NULL),
+        ForeignKey(entity = UserName::class,
+            parentColumns = ["id"],
+            childColumns = ["userId"],
             onDelete = ForeignKey.SET_NULL)
     ]
 )
@@ -19,5 +23,7 @@ data class AudioMetadata (
     val duration: Int,
     val textTranslation: String,
     @ColumnInfo(index = true)
-    var fileId: Long
+    var fileId: Long,
+    @ColumnInfo(index = true)
+    val userId: Long
 )

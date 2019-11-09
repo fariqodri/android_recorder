@@ -3,13 +3,17 @@ package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.view_models
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFile
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioMetadata
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.UserName
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.RecordingModel
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.repositories.AudioFilesRepo
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.repositories.AudioMetadataRepo
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.repositories.SpeechToTextRepo
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.repositories.UserRepo
 import kotlinx.coroutines.*
 
 class RecorderViewModel : ViewModel() {
@@ -39,6 +43,7 @@ class RecorderViewModel : ViewModel() {
 
     private lateinit var audioFilesRepo: AudioFilesRepo
     private lateinit var audioMetadataRepo: AudioMetadataRepo
+    private lateinit var userRepo: UserRepo
 
     private suspend fun insertAudioFile(audioFile: AudioFile, ctx: Context): Long {
         audioFilesRepo = AudioFilesRepo.getInstance(ctx)!!
@@ -68,7 +73,9 @@ class RecorderViewModel : ViewModel() {
     }
 
     fun saveAudio(recordingModel: RecordingModel, context: Context): Job {
+        userRepo = UserRepo.getInstance(context)
         return coroutineScope.launch(Dispatchers.Default) {
+            val userName = userRepo.findLast().first()
             val audioFileId = insertAudioFile(AudioFile(
                 fileLocation = recordingModel.fileLocation,
                 fileName = recordingModel.fileName
@@ -79,7 +86,8 @@ class RecorderViewModel : ViewModel() {
                 timestamp = timestampStart,
                 duration = (timestampEnd - timestampStart).toInt() / 1000,
                 fileId = audioFileId,
-                textTranslation = recordingModel.textTranslation!!
+                textTranslation = recordingModel.textTranslation!!,
+                userId = userName.id!!
             ), context)
         }
     }
