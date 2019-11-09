@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="recordingViewModel"
+            type="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.view_models.RecorderViewModel" />
+
+        <variable
+            name="eventHandler"
+            type="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.event_handlers.RecorderViewEventHandler" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.RecorderFragment">
+
+
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            style="?android:attr/progressBarStyleLarge"
+            android:visibility="@{recordingViewModel.isLoading ? View.VISIBLE : View.GONE}"
+            />
+
+        <TextView
+            android:id="@+id/timer"
+            app:layout_constraintVertical_chainStyle="spread"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@id/translation_result"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="35pt"
+            android:text="@{String.format(`%02d`, recordingViewModel.currentSec/60) + `:` + String.format(`%02d`, recordingViewModel.currentSec%60)}"
+            />
+
+        <TextView
+            android:id="@+id/translation_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/timer" app:layout_constraintBottom_toTopOf="@id/start_record_button"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textAlignment="center"
+            android:text="@{recordingViewModel.textTranslation}"
+            android:visibility="@{recordingViewModel.isLoading ? View.INVISIBLE : View.VISIBLE}"
+            />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/start_record_button"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:backgroundTint="@color/white"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toBottomOf="@id/translation_result"
+            android:textSize="15sp"
+            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"
+            app:iconSize="70dp"
+            app:iconTint="@color/error"
+            app:icon="@{recordingViewModel.isStart ? @drawable/round_button : @drawable/stop_button}"
+            android:onClick="@{() -> eventHandler.recButtonOnClick(recordingViewModel.isStart)}"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

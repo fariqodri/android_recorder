@@ -5,25 +5,26 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.R
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.activities.MainActivity
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.databinding.AudioListItemBinding
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.databinding.FragmentPlayerBinding
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFileWithMetadata
-import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.services.PAUSE_PLAYER_ACTION
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.event_handlers.PlayerViewEventHandler
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.fragments.PlayerFragment
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.AudioListItemModel
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.services.PlayerService
-import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.services.RESUME_PLAYER_ACTION
-import kotlinx.android.synthetic.main.audio_list_item.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-enum class PlayState {
-    START, PAUSE, RESUME
-}
-// TODO: PAKE FRAGMENT SEBAGAI ITEM
-class AudioListAdapter (val audioFiles: List<AudioFileWithMetadata>, val context: Context): RecyclerView.Adapter<AudioItemViewHolder>() {
+class AudioListAdapter (val audioFiles: List<AudioFileWithMetadata>, val context: Context, val eventHandler: PlayerViewEventHandler): RecyclerView.Adapter<AudioListAdapter.AudioItemViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioItemViewHolder {
-        return AudioItemViewHolder(LayoutInflater.from(context).inflate(R.layout.audio_list_item, parent, false))
+        val layoutInflater = LayoutInflater.from(context)
+//        LayoutInflater.from(context).inflate(R.layout.audio_list_item, parent, false)
+        val binding = AudioListItemBinding.inflate(layoutInflater, parent, false)
+        return AudioItemViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
@@ -34,41 +35,24 @@ class AudioListAdapter (val audioFiles: List<AudioFileWithMetadata>, val context
         val audioFile = audioFiles[position]
         val timestamp = Date(audioFile.metadatas!!.timestamp)
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("in_ID"))
-        val timeSimpleFormat = SimpleDateFormat("h:mm a", Locale("in_ID"))
         val timeComplexFormat = SimpleDateFormat("HH:mm:ss", Locale("in_ID"))
         val duration = audioFile.metadatas!!.duration
         val minute = duration / 60
         val secs = duration % 60
-        holder.fileName.text = "Audio Recording ${dateFormat.format(timestamp)} ${timeComplexFormat.format(timestamp)}"
-        holder.info.text = "${String.format("%02d", minute)}:${String.format("%02d", secs)} on ${dateFormat.format(timestamp)} ${timeSimpleFormat.format(timestamp)}"
-
+        val filename = context.getString(R.string.list_filename, audioFile.metadatas!!.textTranslation)
+        val info = context.getString(R.string.list_item_info, String.format("%02d", minute), String.format("%02d", secs), dateFormat.format(timestamp), timeComplexFormat.format(timestamp))
+        holder.bind(eventHandler, AudioListItemModel(filename, info, audioFile))
+//        val filename = "Audio Recording of \"${audioFile.metadatas!!.textTranslation}\""
+//        holder.info.text = "${String.format("%02d", minute)}:${String.format("%02d", secs)} on ${dateFormat.format(timestamp)} ${timeComplexFormat.format(timestamp)}"
     }
 
-    internal inner class PlayPauseButton : ImageButton(context) {
-        var mStartPlaying = PlayState.START
-        val clicker = OnClickListener {
-            when (mStartPlaying) {
-                PlayState.START -> {
-                    val startIntent = Intent(context, PlayerService::class.java)
-                    context.startService(startIntent)
-                }
-                PlayState.PAUSE -> {
-                    val pauseIntent = Intent(context, PlayerService::class.java)
-                    pauseIntent.action = PAUSE_PLAYER_ACTION
-                    context.sendBroadcast(pauseIntent)
-                }
-                PlayState.RESUME -> {
-                    val resumeIntent = Intent(context, PlayerService::class.java)
-                    resumeIntent.action = RESUME_PLAYER_ACTION
-                    context.sendBroadcast(resumeIntent)
-                }
-            }
+    inner class AudioItemViewHolder (private val binding: AudioListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        fun bind(eventHandlers: PlayerViewEventHandler, audioListItem: AudioListItemModel) {
+            binding.eventHandler = eventHandlers
+            binding.audioListItem = audioListItem
+            binding.context = context
+            binding.lifecycleOwner = context as MainActivity
+            binding.executePendingBindings()
         }
     }
-}
-
-class AudioItemViewHolder (view: View): RecyclerView.ViewHolder(view) {
-    val fileName: TextView = view.audio_file_name
-    val info: TextView = view.audio_info
-//    val playButton: ImageButton = view.play_button
 }

@@ -6,45 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/Theme.AppCompat.Light"
-        android:background="@color/colorPrimary"
-        app:title="@string/app_name"
-        app:titleTextColor="@color/white"
-        app:menu="@menu/menu"
-        >
 
-    </androidx.appcompat.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <fragment
+        android:id="@+id/fragment_container"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="35pt"
-        android:text="@string/start_timer"
-        />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/start_record_button"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:backgroundTint="@color/white"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toBottomOf="@id/timer"
-        android:textSize="15sp"
-        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"
-        app:iconSize="70dp"
-        app:iconTint="@color/error"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

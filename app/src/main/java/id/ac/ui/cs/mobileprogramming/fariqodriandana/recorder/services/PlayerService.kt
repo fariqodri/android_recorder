@@ -5,24 +5,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.R
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.activities.MainActivity
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.enums.PlayEnum
 import java.io.IOException
 import java.lang.IllegalStateException
 
 private const val CHANNEL_ID = "RecorderServiceChannelId"
-const val PAUSE_PLAYER_ACTION = "PAUSE_PLAYER_ACTION"
-const val RESUME_PLAYER_ACTION = "RESUME_PLAYER_ACTION"
 
 class PlayerService : Service() {
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer: MediaPlayer? = null
     private var resumePosition: Int = 0
     private lateinit var playerReceiver: PlayerReceiver
+    private lateinit var textTranslation: String
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -30,17 +29,19 @@ class PlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        mediaPlayer = MediaPlayer()
-        val intentFilter = IntentFilter()
+        val intentFilter = IntentFilter().apply {
+            addAction(PlayEnum.PAUSE_ACTION.name)
+            addAction(PlayEnum.RESUME_ACTION.name)
+            addAction(PlayEnum.STOP_PLAYER_ACTION.name)
+        }
         playerReceiver = PlayerReceiver()
-        intentFilter.addAction(PAUSE_PLAYER_ACTION)
-        intentFilter.addAction(RESUME_PLAYER_ACTION)
         registerReceiver(playerReceiver, intentFilter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val filePath = intent?.getStringExtra("FILE_PATH")
-        val filenameInDisplay = intent?.getStringExtra("DISPLAY_FILENAME")
+        val filePath = intent?.getStringExtra("FILE_LOCATION")
+        val filenameInDisplay = intent?.getStringExtra("TEXT_TRANSLATION")
+        textTranslation = filenameInDisplay!!
 
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
@@ -51,9 +52,16 @@ class PlayerService : Service() {
     }
 
     private fun startPlaying(filePath: String?) {
-        mediaPlayer = mediaPlayer.apply {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer()
+        }
+        mediaPlayer = mediaPlayer!!.apply {
             setOnCompletionListener {
                 it.release()
+                mediaPlayer = null
+                val intent = Intent(PlayEnum.STOP_PLAYER_ACTION.name)
+                sendBroadcast(intent)
+                stopSelf()
             }
             reset()
             setDataSource(filePath)
@@ -65,20 +73,28 @@ class PlayerService : Service() {
                 Log.e("Playing Error", e.message)
             }
             start()
+            sendBroadcast(Intent(PlayEnum.PLAY_ACTION.name).apply {
+                putExtra("TEXT_TRANSLATION", textTranslation)
+            })
         }
     }
 
     private fun pausePlaying() {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
-            resumePosition = mediaPlayer.currentPosition
+        if (mediaPlayer != null) {
+            if (mediaPlayer!!.isPlaying) {
+                mediaPlayer!!.pause()
+                resumePosition = mediaPlayer!!.currentPosition
+            }
         }
+
     }
 
     private fun resumePlaying() {
-        if (!mediaPlayer.isPlaying) {
-            mediaPlayer.seekTo(resumePosition)
-            mediaPlayer.start()
+        if (mediaPlayer != null) {
+            if (!mediaPlayer!!.isPlaying) {
+                mediaPlayer!!.seekTo(resumePosition)
+                mediaPlayer!!.start()
+            }
         }
     }
 
@@ -87,6 +103,7 @@ class PlayerService : Service() {
         val descriptionText = getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
+        mChannel.setSound(null, null)
         mChannel.description = descriptionText
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(mChannel)
@@ -101,18 +118,21 @@ class PlayerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        mediaPlayer?.release()
         unregisterReceiver(playerReceiver)
     }
 
     inner class PlayerReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                PAUSE_PLAYER_ACTION -> {
+                PlayEnum.PAUSE_ACTION.name -> {
                     pausePlaying()
                 }
-                RESUME_PLAYER_ACTION -> {
+                PlayEnum.RESUME_ACTION.name-> {
                     resumePlaying()
+                }
+                PlayEnum.STOP_PLAYER_ACTION.name -> {
+                    stopSelf()
                 }
             }
         }

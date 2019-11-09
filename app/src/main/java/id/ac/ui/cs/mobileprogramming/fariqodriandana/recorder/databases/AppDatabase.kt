@@ -9,7 +9,7 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.dao.AudioMetadataD
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioFile
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.AudioMetadata
 
-@Database(entities = [AudioFile::class, AudioMetadata::class], version = 6)
+@Database(entities = [AudioFile::class, AudioMetadata::class], version = 7)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun audioFileDao(): AudioFileDao

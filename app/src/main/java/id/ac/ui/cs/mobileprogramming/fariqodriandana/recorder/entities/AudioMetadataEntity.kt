@@ -17,6 +17,7 @@ data class AudioMetadata (
     val id: Long? = null,
     val timestamp: Long,
     val duration: Int,
+    val textTranslation: String,
     @ColumnInfo(index = true)
     var fileId: Long
 )

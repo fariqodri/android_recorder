@@ -8,27 +8,36 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.activities.MainActivity
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.R
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.enums.RecordIntentActionEnum
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.RecordingModel
 import java.io.IOException
 import java.lang.IllegalStateException
+import java.util.*
+import kotlin.properties.Delegates
 
 private const val CHANNEL_ID = "RecorderServiceChannelId"
-const val TIMER_ACTION = "TIMER_ACTION"
 
 class RecorderService : Service() {
     private var recorder: MediaRecorder? = null
     private var timerThread: Thread? = null
+    private lateinit var filename: String
+    private lateinit var fileLocation: String
+    private var timestampStart: Long by Delegates.notNull()
+    private var timestampEnd: Long by Delegates.notNull()
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val filename = intent?.getStringExtra("filename")
+        filename = intent?.getStringExtra("filename")!!
+        fileLocation = intent.getStringExtra("fileLocation")!!
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         val notification = buildForegroundNotification(filename, pendingIntent)
+
         startForeground(1, notification)
-        startRecording(filename)
+        startRecording(fileLocation)
         Log.d("onStartCommand", "finished")
         return START_NOT_STICKY
     }
@@ -47,6 +56,7 @@ class RecorderService : Service() {
             } catch (e: IOException) {
                 Log.e("Recording", e.message)
             }
+            timestampStart = Date().time
             start()
             Log.d("mediaRecorder", "start")
         }
@@ -59,7 +69,7 @@ class RecorderService : Service() {
             while (true) {
                 try {
                     val intent = Intent()
-                    intent.action = TIMER_ACTION
+                    intent.action = RecordIntentActionEnum.TIMER_ACTION.name
                     intent.putExtra("currentSec", counter)
                     Thread.sleep(1000)
                     counter++
@@ -76,10 +86,13 @@ class RecorderService : Service() {
     private fun stopAndResetTimer() {
         timerThread?.interrupt()
         timerThread = null
-        val intent = Intent()
-        intent.action = TIMER_ACTION
-        intent.putExtra("currentSec", 0)
-        sendBroadcast(intent)
+        val timerIntent = Intent(RecordIntentActionEnum.TIMER_ACTION.name)
+        val stopRecordIntent = Intent(RecordIntentActionEnum.STOP_RECORDER_ACTION.name)
+        stopRecordIntent.putExtra("recordingFile", RecordingModel(fileLocation, filename, timestampStart, timestampEnd, null))
+        timerIntent.putExtra("currentSec", 0)
+//        Log.d(stopRecordIntent.action,stopRecordIntent.action)
+        sendBroadcast(timerIntent)
+        sendBroadcast(stopRecordIntent)
     }
 
     private fun stopRecording() {
@@ -88,11 +101,13 @@ class RecorderService : Service() {
             release()
         }
         recorder = null
+        timestampEnd = Date().time
         stopAndResetTimer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("RecorderService", "Destroyed")
         stopRecording()
     }
 
@@ -101,6 +116,7 @@ class RecorderService : Service() {
         val descriptionText = getString(R.string.channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
+        mChannel.setSound(null, null)
         mChannel.description = descriptionText
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(mChannel)
