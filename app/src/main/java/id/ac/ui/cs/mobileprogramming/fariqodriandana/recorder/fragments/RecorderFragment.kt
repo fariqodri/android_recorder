@@ -123,8 +123,8 @@ class RecorderFragment : Fragment() {
         activity.unregisterReceiver(stopReceiver)
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         if (!activity.isChangingConfigurations){
             stopRecord()
             parentJob.cancel()
