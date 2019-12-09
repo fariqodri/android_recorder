@@ -53,6 +53,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    external fun power(base: Double, raise: Int): Double
+
+    companion object {
+
+        // Used to load the 'native-lib' library on application startup.
+        init {
+            System.loadLibrary("native-lib")
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {

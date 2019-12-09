@@ -28,6 +28,11 @@ android {
     dataBinding {
         enabled = true
     }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
 }
 
 dependencies {
