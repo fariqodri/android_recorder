@@ -59,9 +59,9 @@ class RecorderViewModel : ViewModel() {
         }
     }
 
-    fun recognizeSpeech(fileLocation: String, fileName: String, context: Application) {
+    fun recognizeSpeech(fileLocation: String, fileName: String, channelId: String, context: Application) {
         val speechToTextRepo = SpeechToTextRepo.getInstance()
-        speechToTextRepo.recognizeSpeech(fileLocation, fileName, {
+        speechToTextRepo.recognizeSpeech(fileLocation, fileName, channelId, {
             textTranslation.value = it
             recordingModel?.textTranslation = it
             saveAudio(recordingModel!!, context)

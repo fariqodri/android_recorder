@@ -13,7 +13,7 @@ object RetrofitService {
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("https://speech-to-text-api.kata.ai")
+        .baseUrl("https://speech-to-text-api.katalabs.io")
         .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .build()

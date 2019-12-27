@@ -6,7 +6,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <uses-feature
+        android:glEsVersion="0x00030000"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -15,9 +19,9 @@
         android:roundIcon="@mipmap/launcher_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar">
+        <activity android:name=".activities.EasterEggActivity"></activity>
 
         <service android:name=".services.RecorderService" />
-
         <service android:name=".services.PlayerService" />
 
         <receiver
@@ -25,14 +29,13 @@
             android:exported="true" />
 
         <provider
-            android:authorities="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/shared_files_path"
-                />
+                android:resource="@xml/shared_files_path" />
         </provider>
 
         <activity

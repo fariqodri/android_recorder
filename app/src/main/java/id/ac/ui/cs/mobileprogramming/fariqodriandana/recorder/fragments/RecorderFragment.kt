@@ -1,7 +1,8 @@
 package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.fragments
 
 
-import android.accounts.AccountManager
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.activities.EasterEggActivity
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.jni.CaesarEncryption
 import android.content.*
 import android.os.Bundle
 import android.util.Log
@@ -23,20 +24,18 @@ import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.services.RecorderS
 import androidx.lifecycle.Observer
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.databinding.FragmentRecorderBinding
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.models.RecordingModel
+import kotlinx.android.synthetic.main.fragment_recorder.*
 import kotlinx.coroutines.*
 
-/**
- * A simple [Fragment] subclass.
- * Use the [RecorderFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+//private const val SPEECH_TO_TEXT_CHANNEL_ENCRYPTED="mhypxvkyp"
 class RecorderFragment : Fragment() {
-    private lateinit var activity: MainActivity
+    lateinit var activity: MainActivity
     private lateinit var recorderViewModel: RecorderViewModel
     private lateinit var stopwatchReceiver: StopwatchReceiver
     private lateinit var stopReceiver: RecordingFinishReceiver
     private lateinit var coroutineScope: CoroutineScope
     private lateinit var parentJob: Job
+    private lateinit var caesarEncryption: CaesarEncryption
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,6 +49,7 @@ class RecorderFragment : Fragment() {
         }
         parentJob = Job()
         coroutineScope = CoroutineScope(parentJob)
+        caesarEncryption = CaesarEncryption()
         observeViewModel()
         Log.d("RecordFragment", "Created")
     }
@@ -63,13 +63,22 @@ class RecorderFragment : Fragment() {
         dataBinding.recordingViewModel = recorderViewModel
         dataBinding.eventHandler = RecorderViewEventHandler(this)
         dataBinding.lifecycleOwner = activity
-
         return dataBinding.root
     }
 
     override fun onResume() {
         super.onResume()
         spawnReceivers()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        start_record_button.setOnLongClickListener {
+            val easterEggIntent = Intent(activity, EasterEggActivity::class.java)
+            startActivity(easterEggIntent)
+            return@setOnLongClickListener true
+        }
     }
 
 
@@ -82,7 +91,12 @@ class RecorderFragment : Fragment() {
     fun recognizeSpeech() {
         recorderViewModel.isLoading.value = true
         activity.window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        recorderViewModel.recognizeSpeech(recorderViewModel.recordingModel!!.fileLocation, recorderViewModel.recordingModel!!.fileName, activity.application)
+        recorderViewModel.recognizeSpeech(
+            recorderViewModel.recordingModel!!.fileLocation,
+            recorderViewModel.recordingModel!!.fileName,
+            caesarEncryption.decrypt(getString(R.string.speech_to_text_channel), 7),
+            activity.application
+        )
     }
 
     private fun spawnReceivers() {

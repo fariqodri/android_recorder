@@ -5,4 +5,10 @@
     <string name="stop_rec">HENTIKAN PEREKAMAN</string>
     <string name="list_filename">Rekaman suara "%1$s"</string>
     <string name="list_item_info">%1$s:%2$s pada %3$s %4$s</string>
+    <string name="no_internet">Internet Tidak Tersedia</string>
+    <string name="opengl_error">OpenGL ES 3.0 tidak didukung oleh perangkat ini</string>
+    <string name="easter_egg_info">Tahan tombol rekam untuk melihat easter egg</string>
+    <string name="permission_explain_title">Anda perlu mengijinkan aplikasi ini untuk merekam audio</string>
+    <string name="permission_explanation">Aplikasi ini adalah aplikasi perekam suara yang menerjemahkan suara ke tulisan. Untuk menangkap suara yang akan Anda katakan ke aplikasi ini, aplikasi ini memerlukan izin Anda untuk merekam menggunakan microphone dari smartphone Anda</string>
+    <string name="cancel_button">Batalkan</string>
 </resources>

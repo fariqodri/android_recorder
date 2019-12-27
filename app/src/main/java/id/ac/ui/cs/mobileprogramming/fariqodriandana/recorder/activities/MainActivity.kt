@@ -3,6 +3,8 @@ package id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.activities
 import android.Manifest
 import android.accounts.AccountManager
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -12,6 +14,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
@@ -20,6 +23,7 @@ import androidx.navigation.findNavController
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.R
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.dao.UserDao
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.entities.UserName
+import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.view_models.PermissionViewModel
 import id.ac.ui.cs.mobileprogramming.fariqodriandana.recorder.view_models.UserViewModel
 import kotlinx.coroutines.runBlocking
 
@@ -32,20 +36,20 @@ class MainActivity : AppCompatActivity() {
     var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
     private lateinit var navController: NavController
     private lateinit var userViewModel: UserViewModel
+    private lateinit var permissionViewModel: PermissionViewModel
+    private lateinit var dialog: AlertDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
-            ActivityCompat.requestPermissions(this, permissions,
-                REQUEST_RECORD_AUDIO_PERMISSION
-            )
+            requestPermission()
         }
         if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             navController = findNavController(R.id.fragment_container)
         }
         userViewModel = ViewModelProviders.of(this).get(UserViewModel::class.java)
+        permissionViewModel = ViewModelProviders.of(this).get(PermissionViewModel::class.java)
         if (!userViewModel.promptedForAccount) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
             val intent = AccountManager.newChooseAccountIntent(null, null, arrayOf("com.google"), null, null, null, null)
@@ -53,14 +57,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    external fun power(base: Double, raise: Int): Double
-
-    companion object {
-
-        // Used to load the 'native-lib' library on application startup.
-        init {
-            System.loadLibrary("native-lib")
-        }
+    private fun requestPermission() {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
+        ActivityCompat.requestPermissions(this, permissions,
+            REQUEST_RECORD_AUDIO_PERMISSION
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -76,12 +77,43 @@ class MainActivity : AppCompatActivity() {
                             userViewModel.promptedForAccount = true
                         }
                     }
+                    Toast.makeText(this, R.string.easter_egg_info, Toast.LENGTH_SHORT).show()
                 }
             }
             super.onActivityResult(requestCode, resultCode, data)
         } else {
             finish()
         }
+    }
+
+    private fun showPermissionExplanationDialog() {
+        permissionViewModel.isPermissionExplanationShown = true
+        dialog = AlertDialog.Builder(this).apply {
+            setTitle(R.string.permission_explain_title)
+            setMessage(R.string.permission_explanation)
+            setCancelable(false)
+            setPositiveButton(R.string.ok_button) { dialogInterface, _ ->
+                requestPermission()
+                dialogInterface.dismiss()
+            }
+            setNegativeButton(R.string.cancel_button) {dialogInterface, _ ->
+                dialogInterface.dismiss()
+                finish()
+            }
+        }.create()
+        dialog.setOnShowListener {
+            val positiveButton = (it as AlertDialog).getButton(DialogInterface.BUTTON_POSITIVE)
+            val negativeButton = (it as AlertDialog).getButton(DialogInterface.BUTTON_NEGATIVE)
+            positiveButton.apply {
+                setBackgroundColor(getColor(R.color.white))
+                setTextColor(getColor(R.color.black))
+            }
+            negativeButton.apply {
+                setBackgroundColor(getColor(R.color.white))
+                setTextColor(getColor(R.color.black))
+            }
+        }
+        dialog.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -125,6 +157,12 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        if(!permissionToRecordAccepted) finish()
+        if(!permissionToRecordAccepted) {
+            if (!permissionViewModel.isPermissionExplanationShown) {
+                showPermissionExplanationDialog()
+            } else {
+                finish()
+            }
+        }
     }
 }

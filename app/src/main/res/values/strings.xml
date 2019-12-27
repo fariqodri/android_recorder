@@ -10,4 +10,13 @@
     <string name="timer_value" translatable="false">%1$s:%2$s</string>
     <string name="list_filename">Audio recording of "%1$s"</string>
     <string name="list_item_info">%1$s:%2$s on %3$s %4$s</string>
+    <string name="no_internet">No Internet Available</string>
+    <string name="opengl_error">OpenGL ES 3.0 not supported on device</string>
+    <string name="easter_egg_info">Long press on record button to see easter egg</string>
+    <string name="speech_to_text_channel" translatable="false">mhypxvkyp</string>
+    <string name="permission_explain_title">You need to allow this app to record audio</string>
+    <string name="permission_explanation">This app is an audio recorder app that translates audio to text. In order to capture what you are about to say to this app, it needs to be able to record audio using your smartphone\'s microphone</string>
+    <string name="ok_button" translatable="false">OK</string>
+    <string name="cancel_button">Cancel</string>
+
 </resources>
